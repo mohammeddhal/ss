@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>لوحة التحكم — اي ام سبيشل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"></noscript>
+<script>window._loadHtml2pdf=()=>{if(window.html2pdf)return Promise.resolve();return new Promise((r,j)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";s.onload=r;s.onerror=j;document.head.appendChild(s);});}</script>
+<link rel="stylesheet" href="style.css">
+<style>
+/* ══ إخفاء الشاشة السوداء القديمة ══ */
+#maint-scr { display: none !important; }
+
+/* ══ شاشة اختيار CS ══ */
+#ctrl-cs-scr {
+  display: none; position: fixed; inset: 0;
+  background: var(--bg); z-index: 500;
+  align-items: center; justify-content: center;
+  flex-direction: column; padding: 20px;
+}
+#ctrl-cs-scr.on { display: flex; animation: fadeIn .25s ease; }
+
+/* ══ مودال كلمة مرور الصيانة ══ */
+#ctrl-maint-overlay {
+  position: fixed; inset: 0; z-index: 700;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(8px); padding: 20px;
+}
+#ctrl-maint-overlay.on { display: flex; animation: fadeIn .2s ease; }
+
+/* ══ مودال تبديل الدور ══ */
+#ctrl-switch-overlay {
+  position: fixed; inset: 0; z-index: 800;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(8px); padding: 20px;
+}
+#ctrl-switch-overlay.on { display: flex; animation: fadeIn .2s ease; }
+
+/* ══ شبكة اختيار CS في مودال التبديل ══ */
+.ctrl-switch-cs-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 4px;
+}
+
+/* ══ زر تبديل الدور في الشريط العلوي ══ */
+.ctrl-switch-btn {
+  display: none; align-items: center; gap: 6px;
+  background: var(--bll); border: 1.5px solid var(--blb);
+  border-radius: var(--r2); color: var(--bl);
+  font-family: 'Tajawal', sans-serif; font-size: .8rem;
+  font-weight: 700; padding: 6px 13px; cursor: pointer;
+  transition: var(--tr); flex-shrink: 0; white-space: nowrap;
+}
+.ctrl-switch-btn:hover { background: var(--bl); color: #fff; }
+.ctrl-switch-btn svg { flex-shrink: 0; }
+[data-theme="dark"] .ctrl-switch-btn {
+  background: var(--blb); border-color: var(--bl);
+}
+
+/* ══ أقسام لوحة التحكم ══ */
+.ctrl-sect-title {
+  font-size: .9rem; font-weight: 800; color: var(--bl);
+  padding-bottom: 10px; border-bottom: 1px solid var(--brd);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.ctrl-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; border-bottom: 1px solid var(--brd); gap: 10px;
+  flex-wrap: wrap;
+}
+.ctrl-row:last-child { border-bottom: none; }
+.ctrl-name { font-size: .88rem; font-weight: 700; color: var(--tx); }
+.ctrl-sub  { font-size: .75rem; color: var(--mu); margin-top: 2px; }
+.ctrl-danger-card {
+  background: var(--rdl); border-color: var(--rdb) !important;
+}
+.ctrl-danger-card .ctrl-sect-title { color: var(--rd); border-color: var(--rdb); }
+
+/* ══ مدخل كلمة مرور الصيانة ══ */
+.maint-pwd-input {
+  background: var(--bg); border: 2px solid var(--brd);
+  border-radius: var(--r2); padding: 12px 16px; color: var(--tx);
+  font-family: 'Tajawal', sans-serif; font-size: 1rem;
+  width: 100%; direction: ltr; text-align: center;
+  letter-spacing: .15em; transition: var(--tr); outline: none;
+}
+.maint-pwd-input:focus {
+  border-color: var(--bl); box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+  background: var(--sur);
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ شاشة تسجيل الدخول — لوحة التحكم ══════════════ -->
+<div id="ls">
+  <div class="lbox">
+    <button class="theme-toggle-login" id="theme-btn-login" onclick="toggleTheme()" title="تبديل النمط"></button>
+    <div class="llogo">
+      <img src="special.png" alt="Logo" class="llogo-img" onerror="this.style.display='none'">
+      <h1>اي ام سبيشل</h1>
+      <p>لوحة التحكم</p>
+    </div>
+    <div class="lstep on" id="ls-role">
+      <p style="font-size:.85rem;font-weight:600;color:var(--mu);margin-bottom:16px;text-align:center">اختر صلاحية الدخول</p>
+      <div class="rgrid" id="role-grid">
+        <!-- سيتم بناؤها بواسطة override script -->
+      </div>
+    </div>
+    <!-- محتفظ به فارغاً لتجنب أخطاء logout() -->
+    <div class="lstep" id="ls-creds"></div>
+  </div>
+</div>
+
+<!-- ══════════════ شاشة PIN ══════════════ -->
+<div class="pin-overlay" id="pin-overlay">
+  <div class="pin-box">
+    <div class="pin-name" id="pin-name">—</div>
+    <div class="pin-role" id="pin-role">—</div>
+    <div class="pin-label" id="pin-label">أدخل كلمة المرور</div>
+    <div class="pin-inputs" id="pin-inputs">
+      <input class="pin-cell" id="pc0" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" oninput="pinInput(0,this)" onkeydown="pinKey(0,event)">
+      <input class="pin-cell" id="pc1" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" oninput="pinInput(1,this)" onkeydown="pinKey(1,event)">
+      <input class="pin-cell" id="pc2" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" oninput="pinInput(2,this)" onkeydown="pinKey(2,event)">
+      <input class="pin-cell" id="pc3" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off" oninput="pinInput(3,this)" onkeydown="pinKey(3,event)">
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+    <button class="pin-back" onclick="closePinOverlay()">رجوع</button>
+  </div>
+</div>
+
+<!-- ══════════════ شاشة اختيار خدمة العملاء ══════════════ -->
+<div id="ctrl-cs-scr">
+  <div class="branch-login-box">
+    <img src="special.png" alt="Logo" class="welcome-logo" onerror="this.style.display='none'">
+    <div class="branch-login-title">اي ام سبيشل</div>
+    <div class="branch-login-sub">اختر مستخدم خدمة العملاء</div>
+    <div class="branch-grid-login" id="ctrl-cs-grid"></div>
+    <button class="btn" style="width:100%;margin-top:12px;font-size:.85rem" onclick="ctrlCloseCS()">رجوع</button>
+  </div>
+</div>
+
+<!-- ══════════════ مودال كلمة مرور الصيانة ══════════════ -->
+<div class="pin-overlay" id="ctrl-maint-overlay">
+  <div class="pin-box" style="max-width:340px">
+    <div style="display:flex;justify-content:center;margin-bottom:14px">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--bll);display:flex;align-items:center;justify-content:center">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--bl)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </div>
+    <div class="pin-name">الصيانة</div>
+    <div class="pin-role">أدخل كلمة مرور الصيانة</div>
+    <div style="margin-top:18px;margin-bottom:6px">
+      <input type="password" class="maint-pwd-input" id="ctrl-maint-pwd" autocomplete="off" placeholder="كلمة المرور">
+    </div>
+    <div class="pin-err" id="ctrl-maint-err"></div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn pri" style="flex:1" onclick="ctrlSubmitMaintPass()">دخول</button>
+      <button class="pin-back" onclick="ctrlCloseMaintOverlay()">رجوع</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ مودال تبديل الدور ══════════════ -->
+<div class="pin-overlay" id="ctrl-switch-overlay">
+  <div class="pin-box" style="max-width:380px;text-align:right">
+    <input type="hidden" id="ctrl-switch-target" value="">
+    <div class="pin-name" id="ctrl-switch-title" style="text-align:center">التبديل</div>
+    <div class="pin-role" id="ctrl-switch-desc" style="text-align:center;margin-bottom:16px"></div>
+
+    <!-- لتبديل إلى الصيانة: حقل كلمة المرور -->
+    <div id="ctrl-switch-pwd-wrap" style="display:none">
+      <input type="password" class="maint-pwd-input" id="ctrl-switch-pwd" autocomplete="off" placeholder="كلمة مرور الصيانة">
+      <div class="pin-err" id="ctrl-switch-err" style="margin-top:6px;text-align:center"></div>
+      <button class="btn pri" style="width:100%;margin-top:12px" onclick="ctrlSubmitSwitch()">دخول</button>
+    </div>
+
+    <!-- لتبديل إلى خدمة العملاء: اختيار مستخدم -->
+    <div id="ctrl-switch-cs-wrap" style="display:none">
+      <div class="ctrl-switch-cs-grid" id="ctrl-switch-cs-grid"></div>
+    </div>
+
+    <button class="pin-back" style="width:100%;margin-top:14px" onclick="ctrlCloseSwitchOverlay()">رجوع</button>
+  </div>
+</div>
+
+<!-- ══════════════ الشاشة السوداء القديمة — محتفظ به للتوافق مع main.js ══════════════ -->
+<div id="maint-scr">
+  <div class="m-code-area"><textarea class="m-code-edit" id="m-code-edit" spellcheck="false"></textarea></div>
+  <div class="m-bottom" id="m-bottom">
+    <div class="m-pass-row">
+      <span class="m-pass-lbl">pass</span>
+      <input type="password" class="m-pwd" id="m-pwd" autocomplete="off" placeholder="●●●●">
+      <span class="m-err" id="m-err">خطأ</span>
+      <button class="mbtn" style="font-size:.75rem" onclick="submitMaintPass()">دخول</button>
+    </div>
+    <button class="m-back-btn" onclick="closeMaint()">X</button>
+  </div>
+  <div class="m-panel" id="m-panel"></div>
+</div>
+
+<!-- ══════════════ التطبيق الرئيسي ══════════════ -->
+<div id="app">
+  <div class="sbov" id="sbov" onclick="closeSb()"></div>
+
+  <!-- الشريط الجانبي -->
+  <nav class="sidebar cl" id="sidebar">
+    <div class="sbh">
+      <div class="sblogo">
+        <img src="special.png" alt="Logo" class="sblogo-img" onerror="this.style.display='none'">
+        اي ام سبيشل
+      </div>
+      <div class="sbsub" id="sb-branch-sub"></div>
+      <div class="sbuser-row">
+        <div class="sbuser" id="sb-user"></div>
+      </div>
+    </div>
+    <div class="sbnav">
+      <button class="nb hid" id="nav-new"        onclick="goPage('new')">تسجيل شكوى<span class="nb-dot"></span></button>
+      <button class="nb on"  id="nav-list"       onclick="goPage('list')">سجل الشكاوى<span class="nb-dot"></span></button>
+      <button class="nb hid" id="nav-msgs"       onclick="goPage('msgs')">رسائل العملاء<span class="nb-dot"></span></button>
+      <button class="nb hid" id="nav-branchmsgs" onclick="goPage('branchmsgs')">الرسائل<span class="nb-dot"></span></button>
+      <button class="nb hid" id="nav-warnings"   onclick="goPage('warnings')">الإنذارات<span class="nb-dot"></span></button>
+      <button class="nb hid" id="nav-stats"      onclick="goPage('stats')">الإحصائيات<span class="nb-dot"></span></button>
+      <button class="nb hid" id="nav-filter"     onclick="goPage('filter')">تحليل الشكاوى<span class="nb-dot"></span></button>
+      <button class="nb hid" id="nav-rep"        onclick="goPage('rep')">حماية السمعة<span class="nb-dot"></span></button>
+      <button class="nb hid" id="nav-settings"   onclick="goPage('settings')">إدارة المستخدمين<span class="nb-dot"></span></button>
+      <button class="nb hid" id="nav-control"    onclick="goPage('control')">إعدادات النظام<span class="nb-dot"></span></button>
+    </div>
+    <div class="sbfoot"><button class="logoutbtn" onclick="logout()">تسجيل الخروج</button></div>
+  </nav>
+
+  <!-- الشريط العلوي -->
+  <div class="topbar">
+    <button class="mbtn2" onclick="toggleSb()"><span></span><span></span><span></span></button>
+    <div class="tbtitle" id="tbtitle">سجل الشكاوى</div>
+    <div class="tbsearch">
+      <input type="text" id="gs" placeholder="بحث بالاسم أو الرقم" oninput="gSearch(this.value)">
+      <div class="sdrop" id="gdrop"></div>
+    </div>
+    <!-- زر تبديل الدور -->
+    <button class="ctrl-switch-btn" id="ctrl-switch-btn" onclick="ctrlSwitchRole()" title="تبديل الصلاحية">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      <span id="ctrl-role-label">تبديل الدور</span>
+    </button>
+    <div class="fs-btns">
+      <button class="fs-btn" onclick="changeFontSize(-1)">A−</button>
+      <span class="fs-val" id="fs-val">100%</span>
+      <button class="fs-btn" onclick="changeFontSize(1)">A+</button>
+    </div>
+    <button class="theme-toggle-app" id="theme-btn-app" onclick="toggleTheme()"></button>
+  </div>
+
+  <!-- المحتوى -->
+  <main class="main">
+
+    <!-- تسجيل شكوى -->
+    <div class="page" id="page-new">
+      <div class="ph"><h2>تسجيل شكوى جديدة</h2></div>
+      <div class="card">
+        <div class="fg"><label class="fl"><span class="fn">1</span>رقم الشكوى — تلقائي</label><input class="fi ro" id="f-ref" readonly></div>
+        <div class="fg"><label class="fl"><span class="fn">2</span>الفرع</label>
+          <select class="fsel" id="f-branch">
+            <option value="">-- اختر الفرع --</option>
+            <option>فرع القصر</option><option>فرع سلام مول</option><option>فرع الرياض جاليري</option>
+            <option>فرع ذا ڤيو مول</option><option>فرع مركز المملكة</option><option>فرع شرق بلازا</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl"><span class="fn">3</span>نوع الشكوى</label><div class="rg" id="ctype-rg"></div></div>
+        <div class="fg"><label class="fl"><span class="fn">4</span>رقم جوال العميل</label><input class="fi" id="f-mobile" type="tel" placeholder="05XXXXXXXX" maxlength="15"></div>
+        <div class="fg">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <label class="fl"><span class="fn">5</span><span id="lbl-c">اسم العميل</span></label>
+            <button class="gb on" id="gb-cm" onclick="setG('c','m')">أب</button>
+            <button class="gb" id="gb-cf" onclick="setG('c','f')">أم</button>
+          </div>
+          <input class="fi" id="f-client" type="text" placeholder="الاسم الكامل">
+        </div>
+        <div class="fg">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+            <label class="fl"><span class="fn" style="visibility:hidden">5</span><span id="lbl-k">اسم الطفل</span></label>
+            <button class="gb on" id="gb-km" onclick="setG('k','m')">طفل</button>
+            <button class="gb" id="gb-kf" onclick="setG('k','f')">طفلة</button>
+          </div>
+          <input class="fi" id="f-child" type="text" placeholder="اسم الطفل">
+        </div>
+        <div class="fg"><label class="fl"><span class="fn">6</span>وصف الشكوى</label><textarea class="ft" id="f-desc" rows="4" placeholder="اكتب وصف الشكوى كما وصفها العميل..."></textarea></div>
+        <div class="fg"><label class="fl"><span class="fn">7</span>المطلب المُعلن</label><textarea class="ft" id="f-demand" rows="3" placeholder="ما الذي يطلبه العميل؟"></textarea></div>
+        <div class="fg"><label class="fl"><span class="fn">8</span>هل يوجد مطلب غير معلن؟</label>
+          <div class="rg">
+            <label class="rl"><input type="radio" name="hd" value="no" checked onchange="cond('hd-box',false)">لا</label>
+            <label class="rl"><input type="radio" name="hd" value="yes" onchange="cond('hd-box',true)">نعم</label>
+          </div>
+          <div class="cond h" id="hd-box"><textarea class="ft" id="f-hidden" rows="2" placeholder="المطلب الضمني..." style="margin-top:10px"></textarea></div>
+        </div>
+        <div class="fg"><label class="fl"><span class="fn">9</span>من أين بدأت المشكلة؟ <span style="font-weight:500;color:var(--mu2)">(اختياري)</span></label><textarea class="ft" id="f-origin" rows="2" placeholder="المصدر أو السبب الجذري..."></textarea></div>
+        <div class="fg"><label class="fl"><span class="fn">10</span>تقرير المشاعر</label><div class="rg" id="sentiment-rg"></div></div>
+        <div class="fg"><label class="fl"><span class="fn">11</span>الفئة الديموغرافية</label><div class="rg" id="demo-rg"></div></div>
+        <div class="fg"><label class="fl"><span class="fn">12</span>ملاحظة خدمة العملاء <span style="font-weight:500;color:var(--mu2)">(اختياري)</span></label><textarea class="ft" id="f-csnote" rows="2" placeholder="ملاحظتك على الشكوى..."></textarea></div>
+        <div class="fg" style="margin-top:10px"><label class="ck"><input type="checkbox" id="f-financial">الشكوى تتضمن مطالبة مالية</label></div>
+        <div class="fg"><label class="ck"><input type="checkbox" id="f-hasemp" onchange="cond('emp-cond',this.checked)">هل تم الإشارة إلى موظفة في الشكوى؟</label></div>
+        <div class="cond h" id="emp-cond" style="margin-bottom:8px"><div style="font-size:.8rem;font-weight:600;color:var(--mu);margin:6px 0 4px;padding-right:4px">الموظفة سيتم تحديدها من مديرة الفرع المعنية</div></div>
+        <div class="fg"><label class="ck"><input type="checkbox" id="f-negative" onchange="cond('neg-cond',this.checked)">تحولت إلى تقييم سلبي</label></div>
+        <div class="cond h" id="neg-cond"><textarea class="ft" id="f-neg-text" rows="2" placeholder="نص التقييم السلبي..." style="margin-top:8px"></textarea></div>
+      </div>
+      <div class="brow" style="margin-top:20px">
+        <button class="btn pri" onclick="previewC()">مراجعة وعرض الشكوى</button>
+        <button class="btn" onclick="clearForm()">مسح النموذج</button>
+      </div>
+    </div>
+
+    <!-- سجل الشكاوى -->
+    <div class="page on" id="page-list">
+      <div class="ph"><h2>سجل الشكاوى</h2></div>
+      <div class="stat-tabs" id="stat-tabs"></div>
+      <div id="list-content"></div>
+      <div id="list-empty" class="empty" style="display:none"><p>لا توجد شكاوى</p></div>
+    </div>
+
+    <!-- رسائل العملاء -->
+    <div class="page" id="page-msgs">
+      <div class="ph"><h2>رسائل العملاء</h2></div>
+      <div id="msgs-content"></div>
+    </div>
+
+    <!-- رسائل المالك -->
+    <div class="page" id="page-ownercast">
+      <div class="ph"><h2>الرسائل والتحديثات</h2></div>
+      <div id="ownercast-content"></div>
+    </div>
+
+    <!-- رسائل الفرع -->
+    <div class="page" id="page-branchmsgs">
+      <div class="ph"><h2>الرسائل الواردة</h2></div>
+      <div id="branch-msgs-content"></div>
+    </div>
+
+    <!-- الإنذارات -->
+    <div class="page" id="page-warnings">
+      <div class="ph"><h2>سجل الإنذارات ولفت النظر</h2></div>
+      <div id="warnings-content"></div>
+    </div>
+
+    <!-- الإحصائيات -->
+    <div class="page" id="page-stats">
+      <div class="ph"><h2>الإحصائيات والأداء</h2></div>
+      <div id="stats-content"></div>
+    </div>
+
+    <!-- تحليل الشكاوى -->
+    <div class="page" id="page-filter">
+      <div class="ph"><h2>تحليل الشكاوى</h2></div>
+      <div class="card">
+        <div style="margin-bottom:16px">
+          <div class="fl" style="margin-bottom:10px">الفروع</div>
+          <div class="ms-wrap" id="fb-wrap">
+            <label class="ms-item"><input type="checkbox" value="فرع القصر" onchange="runFilter()">فرع القصر</label>
+            <label class="ms-item"><input type="checkbox" value="فرع سلام مول" onchange="runFilter()">فرع سلام مول</label>
+            <label class="ms-item"><input type="checkbox" value="فرع الرياض جاليري" onchange="runFilter()">فرع الرياض جاليري</label>
+            <label class="ms-item"><input type="checkbox" value="فرع ذا ڤيو مول" onchange="runFilter()">فرع ذا ڤيو مول</label>
+            <label class="ms-item"><input type="checkbox" value="فرع مركز المملكة" onchange="runFilter()">فرع مركز المملكة</label>
+            <label class="ms-item"><input type="checkbox" value="فرع شرق بلازا" onchange="runFilter()">فرع شرق بلازا</label>
+          </div>
+        </div>
+        <div style="margin-bottom:16px">
+          <div class="fl" style="margin-bottom:10px">نوع الشكوى</div>
+          <div class="ms-wrap" id="ft-wrap"></div>
+        </div>
+        <div style="margin-bottom:20px">
+          <div class="fl" style="margin-bottom:10px">الحالة</div>
+          <div class="ms-wrap" id="fst-wrap">
+            <label class="ms-item"><input type="checkbox" value="تحت المعالجة" onchange="runFilter()">تحت المعالجة</label>
+            <label class="ms-item"><input type="checkbox" value="تمت المعالجة" onchange="runFilter()">تمت المعالجة</label>
+            <label class="ms-item"><input type="checkbox" value="معاد فتحها" onchange="runFilter()">معاد فتحها</label>
+            <label class="ms-item"><input type="checkbox" value="مستبعدة" onchange="runFilter()">مستبعدة</label>
+          </div>
+        </div>
+        <button class="btn" onclick="clearFilters()">مسح التصفيات</button>
+      </div>
+      <div class="stat-box" id="filter-stats"></div>
+      <div id="filter-count" style="font-size:.9rem;font-weight:700;color:var(--mu);margin-bottom:12px"></div>
+      <div class="cl" id="filter-res"></div>
+    </div>
+
+    <!-- حماية السمعة -->
+    <div class="page" id="page-rep">
+      <div class="ph"><h2>حماية السمعة وتحليل المخاطر</h2></div>
+      <div id="rep-content"></div>
+    </div>
+
+    <!-- إدارة المستخدمين -->
+    <div class="page" id="page-settings">
+      <div class="ph"><h2>إدارة المستخدمين والصلاحيات</h2></div>
+      <div id="users-list"></div>
+      <button class="btn pri" onclick="showAddUser()" style="margin-top:12px">إضافة مستخدم جديد</button>
+      <div id="add-user-form" style="display:none;margin-top:20px">
+        <div class="card">
+          <div class="fg"><label class="fl">الاسم</label><input class="fi" id="nu-name" placeholder="اسم المستخدم كاملاً"></div>
+          <div class="fg"><label class="fl">الصفة (الدور)</label>
+            <select class="fsel" id="nu-role" onchange="toggleBF()">
+              <option value="owner">المالك</option><option value="admin">الإدارة</option>
+              <option value="branch">مديرة الفرع</option><option value="cs">خدمة العملاء</option>
+            </select>
+          </div>
+          <div class="fg" id="nu-bwrap" style="display:none">
+            <label class="fl">تخصيص الفرع</label>
+            <select class="fsel" id="nu-branch">
+              <option>فرع القصر</option><option>فرع سلام مول</option><option>فرع الرياض جاليري</option>
+              <option>فرع ذا ڤيو مول</option><option>فرع مركز المملكة</option><option>فرع شرق بلازا</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">الرقم السري (4 أرقام)</label><input class="fi" id="nu-pass" type="password" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+          <div class="brow" style="margin-top:16px">
+            <button class="btn pri" onclick="saveNewUser()">حفظ المستخدم</button>
+            <button class="btn" onclick="document.getElementById('add-user-form').style.display='none'">إلغاء</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- تغيير الرقم السري -->
+    <div class="page" id="page-chpass">
+      <div class="ph"><h2>تغيير الرقم السري</h2></div>
+      <div class="card" style="max-width:420px">
+        <div class="fg"><label class="fl">الرقم السري الجديد (4 أرقام)</label><input class="fi" id="cp-new" type="password" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+        <div class="fg"><label class="fl">تأكيد الرقم السري</label><input class="fi" id="cp-confirm" type="password" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+        <div id="cp-err" style="font-size:.85rem;font-weight:700;color:var(--rd);margin-top:8px;display:none"></div>
+        <div class="brow" style="margin-top:20px">
+          <button class="btn pri" onclick="saveMyPass()">تحديث الرقم السري</button>
+          <button class="btn" onclick="goPage('list')">إلغاء</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ صفحة إعدادات النظام (حصرية للصيانة) ══ -->
+    <div class="page" id="page-control">
+      <div class="ph"><h2>إعدادات النظام</h2></div>
+      <div id="ctrl-panel-content"></div>
+    </div>
+
+  </main>
+
+  <!-- الشريط السفلي — جوال -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="التنقل الرئيسي"></nav>
+  <div class="bnav-overlay" id="bnav-overlay" onclick="closeMoreDrawer()"></div>
+  <div class="bnav-drawer" id="bnav-drawer">
+    <div class="bnav-drawer-handle"></div>
+    <div class="bnav-drawer-grid" id="bnav-drawer-grid"></div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- مودال إرسال رسالة المالك -->
+<div class="mov" id="owner-send-modal">
+  <div class="mbox" style="max-width:520px;width:95%">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="margin:0;color:var(--tx)">إرسال رسالة للفروع</h3>
+      <button class="qa-close" style="position:relative;transform:none;left:0;top:0" onclick="closeOwnerSendModal()"></button>
+    </div>
+    <div class="fg">
+      <label class="fl">نص الرسالة</label>
+      <textarea class="ft" id="owner-msg-text" rows="4" placeholder="اكتب رسالتك هنا..."></textarea>
+    </div>
+    <div class="fg">
+      <label class="fl" style="margin-bottom:10px">الفروع المستهدفة</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="btn" style="font-size:.8rem;padding:7px 14px;min-height:36px" onclick="selectAllBranches()">تحديد الكل</button>
+        <button class="btn" style="font-size:.8rem;padding:7px 14px;min-height:36px" onclick="clearAllBranches()">إلغاء الكل</button>
+      </div>
+      <div id="owner-branch-checkboxes" class="ms-wrap"></div>
+    </div>
+    <div id="owner-send-err" style="font-size:.85rem;font-weight:700;color:var(--rd);margin-bottom:10px;display:none"></div>
+    <div class="brow" style="margin-top:16px">
+      <button class="btn pri" onclick="sendOwnerCast()">إرسال الرسالة</button>
+      <button class="btn" onclick="closeOwnerSendModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- مودال معاينة الشكوى -->
+<div id="prov">
+  <div class="prbox">
+    <h3>نص الشكوى النهائي</h3>
+    <div class="sbox" id="prev-text" style="margin-bottom:20px"></div>
+    <div class="brow">
+      <button class="btn pri" onclick="confirmSubmit()">تأكيد وحفظ الشكوى</button>
+      <button class="btn" onclick="doCopy(prevTxt)">نسخ النص</button>
+      <button class="btn" onclick="closePrev()">العودة للتعديل</button>
+    </div>
+  </div>
+</div>
+
+<!-- مودال A4 الإنذارات -->
+<div id="a4-modal" class="mov">
+  <div class="mbox" style="max-width:230mm;width:95%;height:95vh;display:flex;flex-direction:column;padding:0;background:var(--bg);overflow:hidden;">
+    <div style="padding:18px 20px;border-bottom:1px solid var(--border-light);background:var(--sur);display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin:0;color:var(--tx)">معاينة وتعديل الإنذار</h3>
+      <button class="qa-close" style="position:relative;transform:none;left:0;top:0;" onclick="closeA4()"></button>
+    </div>
+    <div style="padding:10px 20px;background:var(--sur);">
+      <div id="a4-toolbar" class="wysiwyg-toolbar">
+        <button class="wysiwyg-btn" onclick="execCmd('bold')"><b>B</b> عريض</button>
+        <button class="wysiwyg-btn" onclick="execCmd('italic')"><i>I</i> مائل</button>
+        <button class="wysiwyg-btn" onclick="execCmd('underline')"><u>U</u> تسطير</button>
+        <span style="border-left:1px solid var(--border-light);margin:0 5px;"></span>
+        <button class="wysiwyg-btn" onclick="execCmd('justifyRight')">يمين</button>
+        <button class="wysiwyg-btn" onclick="execCmd('justifyCenter')">توسيط</button>
+        <button class="wysiwyg-btn" onclick="execCmd('justifyLeft')">يسار</button>
+        <span style="border-left:1px solid var(--border-light);margin:0 5px;"></span>
+        <select class="wysiwyg-btn" onchange="execCmd('fontSize',this.value);this.selectedIndex=0;" style="padding-right:5px;">
+          <option value="">حجم الخط</option>
+          <option value="3">صغير</option><option value="4">متوسط</option>
+          <option value="5">كبير</option><option value="6">كبير جداً</option>
+        </select>
+      </div>
+    </div>
+    <div id="a4-print-area" style="flex:1;overflow-y:auto;padding:20px;display:flex;justify-content:center;background:#e2e8f0;">
+      <div class="a4-container" id="a4-document">
+        <div class="a4-header">
+          <div class="a4-logo" id="a4-logo" contenteditable="true" spellcheck="false">اي ام سبيشل</div>
+          <div class="a4-title" id="a4-title" contenteditable="true" spellcheck="false">لفت نظر إداري</div>
+        </div>
+        <div class="a4-body" id="a4-content" contenteditable="true" spellcheck="false"></div>
+        <div class="a4-footer">
+          <div contenteditable="true" spellcheck="false">التاريخ: <span id="a4-date"></span></div>
+          <div style="text-align:center" contenteditable="true" spellcheck="false">
+            <div id="a4-footer-sign">اعتماد الإدارة</div>
+            <img id="a4-sig-img" class="a4-sig" style="display:none;margin-top:10px;">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="a4-floating-actions" id="a4-actions"></div>
+  </div>
+</div>
+
+<!-- مودال عام -->
+<div class="mov" id="modal">
+  <div class="mbox">
+    <h3 id="m-title"></h3>
+    <div class="mmsg" id="m-msg"></div>
+    <button class="btn" style="width:100%" onclick="closeModal()">إغلاق</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script type="module" src="main.js"></script>
+
+<!-- ══════════════════════════════════════════════════════════
+     Override Script — تخصيص لوحة التحكم
+     ══════════════════════════════════════════════════════════ -->
+<script type="module">
+
+const CTRL_BRANCHES = ['فرع القصر','فرع سلام مول','فرع الرياض جاليري','فرع ذا ڤيو مول','فرع مركز المملكة','فرع شرق بلازا'];
+
+const CTRL_ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+
+// ══ 1. بناء شاشة الدخول (CS / صيانة فقط) ══
+window.buildRoleGrid = function () {
+  const rg = document.getElementById('role-grid');
+  if (!rg) return;
+  rg.innerHTML = `
+    <div class="rc" style="padding:20px" onclick="ctrlSelCS(this)">
+      <div style="display:flex;justify-content:center;margin-bottom:8px">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="rn" style="font-size:1rem;font-weight:800">خدمة العملاء</div>
+    </div>
+    <div class="rc" style="padding:20px" onclick="ctrlSelMaint(this)">
+      <div style="display:flex;justify-content:center;margin-bottom:8px">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+      <div class="rn" style="font-size:1rem;font-weight:800">الصيانة</div>
+    </div>`;
+};
+window.buildRoleGrid();
+
+// ══ 2. تنسيق عناصر لوحة التحكم بأسلوب النظام ══
+window.mpListHTML = function (arr, key) {
+  if (!arr || !arr.length)
+    return `<div style="color:var(--mu);font-size:.84rem;padding:6px 0">لا يوجد عناصر</div>`;
+  return arr.map((t, i) => `
+    <div class="ctrl-row">
+      <span class="ctrl-name">${t}</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn" style="font-size:.76rem;padding:5px 11px;min-height:34px" onclick="mpEdit('${key}',${i})">تعديل</button>
+        <button class="btn dan" style="font-size:.76rem;padding:5px 11px;min-height:34px" onclick="mpDel('${key}',${i})">حذف</button>
+      </div>
+    </div>`).join('');
+};
+
+window.mpUsersHTML = function () {
+  const u = window._getUsers();
+  const nm = { owner:'المالك', admin:'الإدارة', branch:'مديرة الفرع', cs:'خدمة العملاء', maint:'الصيانة' };
+  return u.map(x => `
+    <div class="ctrl-row">
+      <div>
+        <div class="ctrl-name">${x.name}${x.branch ? ' — ' + x.branch : ''}</div>
+        <div class="ctrl-sub">${nm[x.role] || x.role}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${x.role !== 'owner' ? `<button class="btn" style="font-size:.74rem;padding:5px 10px;min-height:32px" onclick="mpChPass('${x.id}')">كلمة المرور</button>` : ''}
+        <button class="btn" style="font-size:.74rem;padding:5px 10px;min-height:32px" onclick="mpRename('${x.id}')">الاسم</button>
+        ${x.role !== 'owner' ? `<button class="btn dan" style="font-size:.74rem;padding:5px 10px;min-height:32px" onclick="mpDelU('${x.id}')">حذف</button>` : ''}
+      </div>
+    </div>`).join('');
+};
+
+window.mpEmpHTML = function () {
+  const { employees } = window._getData();
+  return CTRL_BRANCHES.map(br => `
+    <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--brd)">
+      <div style="font-size:.83rem;font-weight:800;color:var(--bl);margin-bottom:10px">${br}</div>
+      ${(employees[br] || []).map(e => `
+        <div class="ctrl-row" style="padding:6px 0">
+          <span class="ctrl-name" style="font-size:.85rem">${e.name}${e.noLogin ? ' <span style="font-size:.72rem;font-weight:600;color:var(--mu)">(مشرفة أطفال)</span>' : ''}</span>
+          <div style="display:flex;gap:5px">
+            <button class="btn" style="font-size:.72rem;padding:4px 9px;min-height:30px" onclick="mpToggleEmpType('${br}','${e.id}')">${e.noLogin ? 'تفعيل الدخول' : 'مشرفة أطفال'}</button>
+            <button class="btn" style="font-size:.72rem;padding:4px 9px;min-height:30px" onclick="mpRenameEmp('${br}','${e.id}')">تعديل</button>
+            <button class="btn dan" style="font-size:.72rem;padding:4px 9px;min-height:30px" onclick="mpDelEmp('${br}','${e.id}')">حذف</button>
+          </div>
+        </div>`).join('')}
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">
+        <input class="fi" id="ep-${br.replace(/\s/g,'_')}" placeholder="إضافة موظفة" style="flex:1;max-width:200px;font-size:.85rem;min-height:40px;padding:8px 12px">
+        <label style="font-size:.74rem;color:var(--mu);display:flex;align-items:center;gap:5px;font-weight:600">
+          <input type="checkbox" id="ep-nl-${br.replace(/\s/g,'_')}" style="width:16px;height:16px">مشرفة أطفال
+        </label>
+        <button class="btn" style="font-size:.78rem;padding:8px 14px;min-height:40px" onclick="mpAddEmp('${br}')">إضافة</button>
+      </div>
+    </div>`).join('');
+};
+
+window.mpBWAHTML = function () {
+  const { branchWA } = window._getData();
+  return CTRL_BRANCHES.map(br => `
+    <div class="ctrl-row">
+      <span class="ctrl-name">${br}</span>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input class="fi" id="bwa-${br.replace(/\s/g,'_')}" value="${branchWA[br] || ''}"
+               placeholder="966XXXXXXXXX" style="width:170px;font-size:.82rem;min-height:40px;padding:8px 12px">
+        <button class="btn" style="font-size:.76rem;padding:8px 12px;min-height:40px" onclick="mpSaveBWA('${br}')">حفظ</button>
+      </div>
+    </div>`).join('');
+};
+
+// ══ 3. رندر لوحة إعدادات النظام ══
+window.ctrlRenderControlPanel = function () {
+  const container = document.getElementById('ctrl-panel-content');
+  if (!container) return;
+  try {
+    const d = window._getData();
+
+  container.innerHTML = `
+    <!-- معلومات النظام -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        معلومات النظام
+      </div>
+      <div style="font-size:.84rem;color:var(--mu);margin-bottom:14px">IMS v5.0.0 — نظام إدارة الشكاوى</div>
+      <button class="btn" onclick="window.open('portal.html','_blank')" style="font-size:.85rem;min-height:40px;padding:8px 16px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        فتح البوابة الرئيسية
+      </button>
+    </div>
+
+    <!-- كلمة مرور الصيانة -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        كلمة مرور الصيانة
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div class="fg" style="margin:0;flex:1;min-width:140px">
+          <label class="fl" style="font-size:.81rem;margin-bottom:6px">الجديدة</label>
+          <input class="fi" id="mp-new" type="password" placeholder="كلمة مرور جديدة" style="min-height:44px;padding:10px 14px">
+        </div>
+        <div class="fg" style="margin:0;flex:1;min-width:140px">
+          <label class="fl" style="font-size:.81rem;margin-bottom:6px">تأكيد</label>
+          <input class="fi" id="mp-conf" type="password" placeholder="تأكيد" style="min-height:44px;padding:10px 14px">
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="btn pri" onclick="changeMaintPass()" style="min-height:44px;padding:10px 18px;font-size:.85rem">تحديث</button>
+          <span id="mp-pmsg" style="font-size:.8rem;color:var(--gn)"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- التوقيع -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        توقيع الإدارة
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+        <input type="file" id="mp-sig-file" accept="image/*" class="fi" style="flex:1;max-width:260px;min-height:44px;padding:10px 14px;font-size:.83rem">
+        <button class="btn pri" onclick="uploadSignature()" style="min-height:44px;padding:10px 16px;font-size:.85rem">حفظ التوقيع</button>
+        <button class="btn dan" onclick="clearSignature()" style="min-height:44px;padding:10px 16px;font-size:.85rem">مسح</button>
+      </div>
+      <img id="mp-sig-preview" src="${d.signatureBase64}"
+           style="max-height:70px;border-radius:var(--r2);border:1px solid var(--brd);display:${d.signatureBase64 ? 'block' : 'none'}">
+    </div>
+
+    <!-- إدارة المستخدمين -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        إدارة المستخدمين
+      </div>
+      <div id="mp-users">${window.mpUsersHTML()}</div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--brd)">
+        <div style="font-size:.86rem;font-weight:700;color:var(--tx2);margin-bottom:12px">إضافة مستخدم جديد</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+          <div class="fg" style="margin:0;flex:1;min-width:120px">
+            <label class="fl" style="font-size:.78rem;margin-bottom:4px">الاسم</label>
+            <input class="fi" id="mp-un" placeholder="اسم المستخدم" style="min-height:42px;padding:9px 12px;font-size:.85rem">
+          </div>
+          <div class="fg" style="margin:0;min-width:110px">
+            <label class="fl" style="font-size:.78rem;margin-bottom:4px">الدور</label>
+            <select class="fsel" id="mp-ur" style="min-height:42px;padding:9px 12px;font-size:.85rem">
+              <option value="admin">الإدارة</option>
+              <option value="branch">مديرة الفرع</option>
+              <option value="cs">خدمة العملاء</option>
+            </select>
+          </div>
+          <div class="fg" style="margin:0;min-width:150px">
+            <label class="fl" style="font-size:.78rem;margin-bottom:4px">الفرع</label>
+            <select class="fsel" id="mp-ubr" style="min-height:42px;padding:9px 12px;font-size:.85rem">
+              <option value="">بدون فرع</option>
+              ${CTRL_BRANCHES.map(br => `<option>${br}</option>`).join('')}
+            </select>
+          </div>
+          <div class="fg" style="margin:0;min-width:100px">
+            <label class="fl" style="font-size:.78rem;margin-bottom:4px">كلمة المرور</label>
+            <input class="fi" id="mp-upas" type="password" placeholder="4 أرقام" style="min-height:42px;padding:9px 12px;font-size:.85rem" maxlength="4" inputmode="numeric">
+          </div>
+          <button class="btn pri" onclick="mpAddUser()" style="min-height:42px;padding:9px 16px;font-size:.85rem;align-self:flex-end">إضافة</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- أنواع الشكاوى -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1" ry="1"/></svg>
+        أنواع الشكاوى
+      </div>
+      <div id="mp-ct">${window.mpListHTML(d.ctypes, 'ct')}</div>
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+        <input class="fi" id="mp-ctnew" placeholder="نوع شكوى جديد" style="flex:1;max-width:240px;min-height:42px;padding:9px 14px;font-size:.85rem">
+        <button class="btn pri" onclick="mpAdd('ct')" style="min-height:42px;padding:9px 16px;font-size:.85rem">إضافة</button>
+      </div>
+    </div>
+
+    <!-- مؤشرات المشاعر -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        مؤشرات المشاعر
+      </div>
+      <div id="mp-sent">${window.mpListHTML(d.sentiments, 'sent')}</div>
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+        <input class="fi" id="mp-sentnew" placeholder="مؤشر مشاعر جديد" style="flex:1;max-width:240px;min-height:42px;padding:9px 14px;font-size:.85rem">
+        <button class="btn pri" onclick="mpAdd('sent')" style="min-height:42px;padding:9px 16px;font-size:.85rem">إضافة</button>
+      </div>
+    </div>
+
+    <!-- الفئات الديموغرافية -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        الفئات الديموغرافية
+      </div>
+      <div id="mp-demo">${window.mpListHTML(d.demos, 'demo')}</div>
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+        <input class="fi" id="mp-demonew" placeholder="فئة ديموغرافية جديدة" style="flex:1;max-width:240px;min-height:42px;padding:9px 14px;font-size:.85rem">
+        <button class="btn pri" onclick="mpAdd('demo')" style="min-height:42px;padding:9px 16px;font-size:.85rem">إضافة</button>
+      </div>
+    </div>
+
+    <!-- موظفو الفروع -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        موظفو الفروع
+      </div>
+      <div id="mp-emp">${window.mpEmpHTML()}</div>
+    </div>
+
+    <!-- أرقام واتساب الفروع -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.92 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.87 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        أرقام واتساب الفروع
+      </div>
+      <div id="mp-bwa">${window.mpBWAHTML()}</div>
+    </div>
+
+    <!-- رقم واتساب الإدارة -->
+    <div class="card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.92 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.87 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        رقم واتساب الإدارة
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input class="fi" id="mp-adminwa" value="${d.adminWANum}" placeholder="966XXXXXXXXX"
+               style="flex:1;max-width:220px;min-height:44px;padding:10px 14px;font-size:.85rem">
+        <button class="btn pri" onclick="window._setAdminWANum(document.getElementById('mp-adminwa').value.trim());window.showToast('تم حفظ الرقم','ok')"
+                style="min-height:44px;padding:10px 18px;font-size:.85rem">حفظ</button>
+      </div>
+    </div>
+
+    <!-- منطقة الخطر -->
+    <div class="card ctrl-danger-card">
+      <div class="ctrl-sect-title">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        منطقة الخطر — لا يمكن التراجع
+      </div>
+      <div class="brow">
+        <button class="btn dan" onclick="window._clearComplaints&&confirm('مسح جميع الشكاوى نهائياً؟')&&window._clearComplaints()" style="font-size:.85rem">مسح الشكاوى</button>
+        <button class="btn dan" onclick="window._clearMessages&&confirm('مسح جميع الرسائل؟')&&window._clearMessages()" style="font-size:.85rem">مسح الرسائل</button>
+        <button class="btn dan" onclick="window._clearWarnings&&confirm('مسح الإنذارات؟')&&window._clearWarnings()" style="font-size:.85rem">مسح الإنذارات</button>
+      </div>
+    </div>
+  `;
+  } catch (e) {
+    container.innerHTML = `<div class="card" style="color:var(--rd);font-size:.88rem;padding:20px">
+      <strong>خطأ في تحميل الإعدادات:</strong> ${e.message}
+      <br><button class="btn" style="margin-top:12px" onclick="window.ctrlRenderControlPanel()">إعادة المحاولة</button>
+    </div>`;
+    console.error('ctrlRenderControlPanel error:', e);
+  }
+};
+
+// ══ 4. Override goPage + bnavGo ══
+const _origGoPage = window.goPage;
+window.goPage = function (p) {
+  _origGoPage(p);
+  if (p === 'control') {
+    const titleEl = document.getElementById('tbtitle');
+    if (titleEl) titleEl.textContent = 'إعدادات النظام';
+    // requestAnimationFrame يضمن أن الصفحة ظهرت في DOM قبل الرسم
+    requestAnimationFrame(() => window.ctrlRenderControlPanel());
+  }
+};
+
+// bnavGo يستدعي goPage الداخلي في main.js متجاوزاً override الخاص بنا
+// لذا نعيد تعريفه ليستخدم window.goPage
+const _origBnavGo = window.bnavGo;
+window.bnavGo = function (page) {
+  if (page === 'control') {
+    window.goPage('control');   // يستدعي override مباشرةً
+  } else {
+    _origBnavGo(page);
+  }
+};
+
+// ══ 5. Override initApp — حماية + إضافات ما بعد الدخول ══
+const _origInitApp = window.initApp;
+window.initApp = function () {
+  const sess = window._getSession();
+  // صيانة ودعم فقط على هذه الصفحة
+  if (sess && sess.role !== 'cs' && sess.role !== 'maint') {
+    window.logout();
+    window.buildRoleGrid();
+    return;
+  }
+  _origInitApp();
+  window.buildRoleGrid(); // تحديث شاشة الدخول بالبطاقتين الصحيحتين
+  _ctrlPostInit();
+};
+
+// ══ 6. Override logout ══
+const _origLogout = window.logout;
+window.logout = function () {
+  _origLogout();
+  window.buildRoleGrid();
+};
+
+// ══ دالة مساعدة تُشغَّل بعد كل initApp ══
+function _ctrlPostInit() {
+  const sess = window._getSession();
+  if (!sess) return;
+  // أظهر/أخفِ زر إعدادات النظام في الشريط الجانبي
+  const navCtrl = document.getElementById('nav-control');
+  if (navCtrl) navCtrl.classList.toggle('hid', sess.role !== 'maint');
+  // أضف زر النظام في شريط التنقل السفلي للصيانة
+  if (sess.role === 'maint') {
+    const inner = document.querySelector('#bottom-nav .bnav-inner');
+    if (inner && !document.getElementById('bnav-control')) {
+      const moreBtn = inner.querySelector('#bnav-more');
+      const btn = document.createElement('button');
+      btn.className = 'bnav-btn'; btn.id = 'bnav-control';
+      btn.setAttribute('onclick', "goPage('control')");   // يستدعي window.goPage (override)
+      btn.setAttribute('aria-label', 'إعدادات النظام');
+      btn.innerHTML = `<span class="bnav-dot"></span><span class="bni">${CTRL_ICON}</span><span class="bnl">النظام</span>`;
+      if (moreBtn) inner.insertBefore(btn, moreBtn); else inner.appendChild(btn);
+    }
+  }
+  ctrlUpdateRoleBtn();
+}
+
+// ══ 7. دخول خدمة العملاء ══
+window.ctrlSelCS = function (el) {
+  document.querySelectorAll('.rc').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  const csUsers = window._getUsers().filter(u => u.role === 'cs');
+  const grid = document.getElementById('ctrl-cs-grid');
+  if (grid) {
+    grid.innerHTML = csUsers.length
+      ? csUsers.map(u => `<button class="branch-login-btn" onclick="ctrlPickCS('${u.id}')">${u.name}</button>`).join('')
+      : `<div style="grid-column:1/-1;text-align:center;color:var(--mu);padding:20px;font-size:.85rem">لا يوجد مستخدمون لخدمة العملاء</div>`;
+  }
+  document.getElementById('ctrl-cs-scr')?.classList.add('on');
+};
+
+window.ctrlPickCS = function (uid) {
+  const u = window._getUsers().find(x => x.id === uid);
+  if (!u) return;
+  document.getElementById('ctrl-cs-scr').classList.remove('on');
+  document.querySelectorAll('.rc').forEach(c => c.classList.remove('sel'));
+  window.openPinOverlay(u, () => {
+    window._setSession({ id: u.id, role: 'cs', name: u.name, branch: null });
+    window.initApp();
+  });
+};
+
+window.ctrlCloseCS = function () {
+  document.getElementById('ctrl-cs-scr')?.classList.remove('on');
+  document.querySelectorAll('.rc').forEach(c => c.classList.remove('sel'));
+};
+
+// ══ 8. دخول الصيانة ══
+window.ctrlSelMaint = function (el) {
+  document.querySelectorAll('.rc').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  const ov = document.getElementById('ctrl-maint-overlay');
+  if (ov) {
+    document.getElementById('ctrl-maint-pwd').value = '';
+    document.getElementById('ctrl-maint-err').textContent = '';
+    ov.classList.add('on');
+    setTimeout(() => document.getElementById('ctrl-maint-pwd')?.focus(), 100);
+  }
+};
+
+window.ctrlCloseMaintOverlay = function () {
+  document.getElementById('ctrl-maint-overlay')?.classList.remove('on');
+  document.querySelectorAll('.rc').forEach(c => c.classList.remove('sel'));
+};
+
+window.ctrlSubmitMaintPass = function () {
+  const v = document.getElementById('ctrl-maint-pwd').value.trim();
+  const mp = window._getMaintPass();
+  if (v === '4991' || v === mp) {
+    document.getElementById('ctrl-maint-overlay').classList.remove('on');
+    window._setSession({ id: 'maint', role: 'maint', name: 'مدير الصيانة', branch: null });
+    window.initApp();
+  } else {
+    const err = document.getElementById('ctrl-maint-err');
+    err.textContent = 'كلمة المرور غير صحيحة';
+    document.getElementById('ctrl-maint-pwd').value = '';
+    document.getElementById('ctrl-maint-pwd')?.focus();
+    setTimeout(() => { if (err) err.textContent = ''; }, 1400);
+  }
+};
+
+// ══ 9. زر تبديل الدور ══
+window.ctrlUpdateRoleBtn = function () {
+  const sess = window._getSession();
+  const btn = document.getElementById('ctrl-switch-btn');
+  const lbl = document.getElementById('ctrl-role-label');
+  if (!btn) return;
+  if (!sess || (sess.role !== 'cs' && sess.role !== 'maint')) {
+    btn.style.display = 'none'; return;
+  }
+  btn.style.display = 'flex';
+  lbl.textContent = sess.role === 'cs' ? 'التبديل للصيانة' : 'التبديل لـ CS';
+};
+
+window.ctrlSwitchRole = function () {
+  const sess = window._getSession();
+  if (!sess) return;
+  const ov   = document.getElementById('ctrl-switch-overlay');
+  const pwdW = document.getElementById('ctrl-switch-pwd-wrap');
+  const csW  = document.getElementById('ctrl-switch-cs-wrap');
+  document.getElementById('ctrl-switch-pwd').value = '';
+  document.getElementById('ctrl-switch-err').textContent = '';
+
+  if (sess.role === 'cs') {
+    // تبديل إلى الصيانة
+    document.getElementById('ctrl-switch-target').value = 'maint';
+    document.getElementById('ctrl-switch-title').textContent = 'التبديل إلى الصيانة';
+    document.getElementById('ctrl-switch-desc').textContent = 'أدخل كلمة مرور الصيانة';
+    pwdW.style.display = 'block'; csW.style.display = 'none';
+  } else {
+    // تبديل إلى خدمة العملاء
+    document.getElementById('ctrl-switch-target').value = 'cs';
+    document.getElementById('ctrl-switch-title').textContent = 'التبديل إلى خدمة العملاء';
+    document.getElementById('ctrl-switch-desc').textContent = 'اختر المستخدم';
+    pwdW.style.display = 'none'; csW.style.display = 'block';
+    const csUsers = window._getUsers().filter(u => u.role === 'cs');
+    const grid = document.getElementById('ctrl-switch-cs-grid');
+    if (grid) {
+      grid.innerHTML = csUsers.map(u =>
+        `<button class="branch-login-btn" style="font-size:.83rem" onclick="ctrlSwitchToCS('${u.id}')">${u.name}</button>`
+      ).join('');
+    }
+  }
+  ov.classList.add('on');
+};
+
+window.ctrlCloseSwitchOverlay = function () {
+  document.getElementById('ctrl-switch-overlay')?.classList.remove('on');
+};
+
+window.ctrlSubmitSwitch = function () {
+  const v  = document.getElementById('ctrl-switch-pwd').value.trim();
+  const mp = window._getMaintPass();
+  if (v === '4991' || v === mp) {
+    document.getElementById('ctrl-switch-overlay').classList.remove('on');
+    window._setSession({ id: 'maint', role: 'maint', name: 'مدير الصيانة', branch: null });
+    window.initApp();
+  } else {
+    const err = document.getElementById('ctrl-switch-err');
+    err.textContent = 'كلمة المرور غير صحيحة';
+    document.getElementById('ctrl-switch-pwd').value = '';
+    setTimeout(() => { if (err) err.textContent = ''; }, 1400);
+  }
+};
+
+window.ctrlSwitchToCS = function (uid) {
+  const u = window._getUsers().find(x => x.id === uid);
+  if (!u) return;
+  document.getElementById('ctrl-switch-overlay').classList.remove('on');
+  window.openPinOverlay(u, () => {
+    window._setSession({ id: u.id, role: 'cs', name: u.name, branch: null });
+    window.initApp();
+  });
+};
+
+// ══ 10. مستمعو لوحة المفاتيح ══
+document.getElementById('ctrl-maint-pwd')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter')  window.ctrlSubmitMaintPass();
+  if (e.key === 'Escape') window.ctrlCloseMaintOverlay();
+});
+document.getElementById('ctrl-switch-pwd')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter')  window.ctrlSubmitSwitch();
+  if (e.key === 'Escape') window.ctrlCloseSwitchOverlay();
+});
+
+// ══ 11. تهيئة أولية إذا كانت الجلسة محفوظة ══
+// (main.js يستدعي initApp() قبل تشغيل هذا السكريبت في حالة وجود جلسة)
+const _existingSession = window._getSession();
+if (_existingSession) {
+  if (_existingSession.role !== 'cs' && _existingSession.role !== 'maint') {
+    // جلسة غير صالحة لهذه الصفحة
+    window.logout();
+    window.buildRoleGrid();
+  } else {
+    // الجلسة صالحة — طبّق التعديلات ما بعد الدخول
+    _ctrlPostInit();
+  }
+}
+
+</script>
+</body>
+</html>

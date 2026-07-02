@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>اي ام سبيشل — تواصل معنا</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ══ الإعدادات العامة والمتغيرات (تصميم مؤسسي رسمي) ══ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg: #f8fafc;        /* خلفية رئيسية رمادية فاتحة جداً */
+  --sur: #ffffff;       /* لون البطاقات (أبيض) */
+  --tx: #1e293b;        /* نصوص رئيسية (داكن جداً) */
+  --tx2: #475569;       /* نصوص ثانوية */
+  --mu: #64748b;        /* نصوص صامتة */
+  
+  --primary: #1e3a8a;   /* أزرق داكن (رسمي وموثوق) */
+  --primary-hover: #172554; 
+  --accent: #ca8a04;    /* ذهبي هادئ لكلمة سبيشل */
+  
+  --err: #b91c1c;       /* أحمر رسمي للأخطاء والإلزاميات */
+  --gn: #0f766e;        /* أخضر مؤسسي للنجاح */
+  --gnl: #f0fdfa;       /* خلفية النجاح */
+  --gnb: #14b8a6;       /* حدود النجاح */
+  
+  --brd: #cbd5e1;       /* حدود ناعمة */
+  --sh: 0 10px 30px rgba(15, 23, 42, 0.06); /* ظل احترافي ناعم */
+  
+  --r: 8px;             /* زوايا شبه حادة لطابع رسمي */
+  --r2: 6px;
+  --r3: 4px;
+}
+
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--bg);
+  color:var(--tx);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 16px;
+}
+.wrap{width:100%;max-width:540px}
+
+/* ══ الهيدر ══ */
+.header{text-align:center;margin-bottom:36px}
+.brand{font-size:2rem;font-weight:900;letter-spacing:-0.5px;line-height:1.2}
+.brand .am{color:var(--primary)}
+.brand .special{color:var(--accent)}
+.tagline{font-size:1rem;color:var(--mu);margin-top:8px;font-weight:500}
+
+/* ══ البطاقة الرئيسية ══ */
+.card{
+  background:var(--sur);
+  border-radius:var(--r);
+  padding:36px 32px;
+  box-shadow:var(--sh);
+  border:1px solid var(--brd);
+}
+
+/* ══ العناوين والأزرار العلوية ══ */
+.lang-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:8px}
+.section-title{
+  font-size:.85rem;font-weight:800;color:var(--primary);text-transform:uppercase;
+  letter-spacing:.5px;display:flex;align-items:center;gap:8px;
+}
+.section-title::before{content:'';width:4px;height:14px;background:var(--primary);border-radius:2px;display:inline-block}
+
+.lang-btn{
+  background:none;border:none;cursor:pointer;
+  font-family:'Tajawal',sans-serif;font-size:.8rem;
+  color:var(--mu);font-weight:700;padding:6px 12px;
+  border-radius:var(--r2);transition:all .2s;
+  border:1px solid transparent;
+}
+.lang-btn:hover{color:var(--primary);background:rgba(30,58,138,0.05);border-color:var(--brd)}
+
+/* ══ الحقول والنماذج ══ */
+.fg{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.fl{font-size:.9rem;font-weight:700;color:var(--tx2)}
+.fi,.ft{
+  background:#ffffff;
+  border:1px solid var(--brd);
+  border-radius:var(--r2);
+  padding:14px 16px;
+  color:var(--tx);
+  font-family:'Tajawal',sans-serif;
+  font-size:.95rem;
+  width:100%;
+  direction:rtl;
+  transition:all .2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02) inset;
+}
+.fi:focus,.ft:focus{
+  outline:none;
+  border-color:var(--primary);
+  background:var(--sur);
+  box-shadow:0 0 0 3px rgba(30, 58, 138, 0.12);
+}
+.ft{resize:vertical;min-height:120px;line-height:1.7}
+[dir="ltr"] .fi,[dir="ltr"] .ft{direction:ltr;text-align:left}
+
+/* ══ الفروع ══ */
+.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.branch-btn{
+  background:#ffffff;
+  border:1px solid var(--brd);
+  border-radius:var(--r3);
+  padding:14px 8px;
+  font-family:'Tajawal',sans-serif;
+  font-size:.85rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s;
+  color:var(--tx2);
+  text-align:center;
+}
+.branch-btn:hover{border-color:var(--primary);color:var(--primary);background:rgba(30,58,138,0.02)}
+.branch-btn.on{
+  background:var(--primary);
+  border-color:var(--primary);
+  color:#ffffff;
+}
+
+/* ══ الفاصل ══ */
+.divider{border:none;border-top:1px solid var(--brd);margin:24px 0}
+
+/* ══ زر الإرسال ══ */
+.submit-btn{
+  width:100%;
+  padding:16px;
+  background:var(--primary);
+  color:#ffffff;
+  border:none;
+  border-radius:var(--r2);
+  font-family:'Tajawal',sans-serif;
+  font-size:1.05rem;
+  font-weight:800;
+  cursor:pointer;
+  transition:all .2s;
+  margin-top:12px;
+}
+.submit-btn:hover{background:var(--primary-hover);box-shadow:0 4px 12px rgba(30, 58, 138, 0.2)}
+.submit-btn:active{transform:scale(0.99)}
+.submit-btn:disabled{background:var(--mu);cursor:not-allowed;box-shadow:none}
+
+/* ══ مربع النجاح ══ */
+.success{
+  display:none;
+  text-align:center;
+  padding:40px 24px;
+  background:#ffffff;
+  border:1px solid var(--gnb);
+  border-radius:var(--r);
+  margin-top:20px;
+  box-shadow:0 10px 25px rgba(15, 118, 110, 0.08);
+}
+.success-icon{font-size:3.5rem;margin-bottom:16px}
+.success h3{font-size:1.3rem;font-weight:800;color:var(--gn);margin-bottom:10px}
+.success p{font-size:.95rem;color:var(--tx2);font-weight:500;line-height:1.6}
+.success-ref{
+  display:inline-block;
+  margin-top:20px;
+  background:var(--gnl);
+  border:1px dashed var(--gnb);
+  border-radius:var(--r2);
+  padding:10px 24px;
+  font-size:.95rem;
+  font-weight:800;
+  color:var(--gn);
+  font-family:monospace;
+  letter-spacing:1px;
+}
+
+/* ══ الفوتر ══ */
+.footer{text-align:center;margin-top:24px;font-size:.8rem;color:var(--mu);font-weight:500}
+
+@media(max-width:480px){
+  body{padding:20px 16px;align-items:flex-start}
+  .card{padding:28px 20px}
+  .brand{font-size:1.7rem}
+  .branch-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="brand">
+      <span class="am">اي ام</span> <span class="special">سبيشل</span>
+    </div>
+    <div class="tagline" id="tagline">نستمع إليك ونهتم بتجربتك</div>
+  </div>
+
+  <div class="card" id="form-card">
+
+    <div class="lang-row">
+      <div class="section-title" id="lbl-mobile-title">رقم الجوال <span style="color:var(--err)">*</span></div>
+      <button class="lang-btn" id="lang-btn" onclick="toggleLang()">ENGLISH</button>
+    </div>
+
+    <div class="fg" style="margin-bottom:24px">
+      <input class="fi" id="p-mobile" type="tel" placeholder="05XXXXXXXX" maxlength="15" inputmode="tel">
+    </div>
+
+    <hr class="divider">
+
+    <div class="fg" style="margin-bottom:24px">
+      <div class="section-title" id="lbl-branch-title">الفرع</div>
+      <div style="margin-top:16px" class="branch-grid" id="p-branches"></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="fg">
+      <label class="fl" id="lbl-msg">
+        صف / صفي تجربتك أو استفسارك أو اقتراحك <span style="color:var(--err)">*</span>
+      </label>
+      <textarea class="ft" id="p-msg" rows="5" placeholder="..."></textarea>
+    </div>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitMsg()">إرسال</button>
+  </div>
+
+  <div class="success" id="success-box">
+    <div class="success-icon">✅</div>
+    <h3 id="success-title">تم ارسال رسالتك بنجاح</h3>
+    <p id="success-desc">سيتواصل معك فريقنا في أقرب وقت ممكن.</p>
+    <div class="success-ref" id="success-ref"></div>
+  </div>
+
+  <div class="footer" id="footer-txt">اي ام سبيشل · إدارة تجربة العملاء</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyAF6F5N0t7NAbtvXLqBU_W6LHpIZHhLefM",
+  authDomain:        "may2-ff7bd.firebaseapp.com",
+  projectId:         "may2-ff7bd",
+  storageBucket:     "may2-ff7bd.firebasestorage.app",
+  messagingSenderId: "439701463283",
+  appId:             "1:439701463283:web:1879d30f55496dcd729786",
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const COL = "ims";
+
+// ══ بيانات الفروع بالعربية والإنجليزية ══
+const BRANCHES = [
+  { ar: 'فرع القصر',          en: 'AlQasr Mall',      key: 'فرع القصر' },
+  { ar: 'فرع سلام مول',       en: 'Salam Mall',       key: 'فرع سلام مول' },
+  { ar: 'فرع الرياض جاليري',  en: 'Riyadh Gallery',   key: 'فرع الرياض جاليري' },
+  { ar: 'فرع ذا ڤيو مول',    en: 'TheView Mall',     key: 'فرع ذا ڤيو مول' },
+  { ar: 'فرع مركز المملكة',   en: 'Kingdom Center',   key: 'فرع مركز المملكة' },
+  { ar: 'فرع شرق بلازا',      en: 'Shrq Plaza',       key: 'فرع شرق بلازا' },
+];
+
+// ══ النصوص ثنائية اللغة ══
+const TEXTS = {
+  ar: {
+    tagline:       'نستمع إليك ونهتم بتجربتك',
+    mobileTitle:   'رقم الجوال <span style="color:var(--err)">*</span>',
+    branchTitle:   'الفرع',
+    msgLabel:      'صف / صفي تجربتك أو استفسارك أو اقتراحك <span style="color:var(--err)">*</span>',
+    placeholder:   '05XXXXXXXX',
+    msgPlaceholder:'...',
+    submitBtn:     'إرسال',
+    successTitle:  'تم ارسال رسالتك بنجاح',
+    successDesc:   'سيتواصل معك فريقنا في أقرب وقت ممكن.',
+    refLabel:      'رقم التذكرة: ',
+    footer:        'اي ام سبيشل · إدارة تجربة العملاء',
+    langBtn:       'ENGLISH',
+    errMobile:     'يرجى إدخال رقم الجوال',
+    errMobileInvalid:'رقم الجوال غير صحيح. يرجى إدخال رقم سعودي صحيح',
+    errMsg:        'يرجى كتابة رسالتك',
+    sending:       'جارٍ الإرسال…',
+    errSend:       'حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.',
+    dir:           'rtl',
+  },
+  en: {
+    tagline:       'We listen and care about your experience',
+    mobileTitle:   'Mobile Number <span style="color:var(--err)">*</span>',
+    branchTitle:   'Branch',
+    msgLabel:      'Describe your experience, inquiry or suggestion <span style="color:var(--err)">*</span>',
+    placeholder:   '05XXXXXXXX',
+    msgPlaceholder:'...',
+    submitBtn:     'Submit',
+    successTitle:  'Your message was sent successfully',
+    successDesc:   'Our team will contact you as soon as possible.',
+    refLabel:      'Ticket ID: ',
+    footer:        'AM Special · Customer Experience Management',
+    langBtn:       'العربية',
+    errMobile:     'Please enter your mobile number',
+    errMobileInvalid:'Invalid mobile number. Please enter a valid Saudi number',
+    errMsg:        'Please write your message',
+    sending:       'Sending…',
+    errSend:       'An error occurred while sending. Please try again.',
+    dir:           'ltr',
+  }
+};
+
+let currentLang = 'ar';
+window.selectedBranch = '';
+
+function renderBranches() {
+  const grid = document.getElementById('p-branches');
+  grid.innerHTML = BRANCHES.map(b => `
+    <button class="branch-btn ${window.selectedBranch === b.key ? 'on' : ''}"
+      onclick="toggleBranch(this,'${b.key}')">
+      ${currentLang === 'ar' ? b.ar.replace('فرع ','') : b.en}
+    </button>`).join('');
+}
+
+window.toggleBranch = function(btn, key) {
+  document.querySelectorAll('.branch-btn').forEach(b => b.classList.remove('on'));
+  if(window.selectedBranch === key){ window.selectedBranch = ''; return; }
+  btn.classList.add('on');
+  window.selectedBranch = key;
+};
+
+window.toggleLang = function() {
+  currentLang = currentLang === 'ar' ? 'en' : 'ar';
+  applyLang();
+};
+
+function applyLang() {
+  const t = TEXTS[currentLang];
+  const html = document.documentElement;
+  html.setAttribute('lang', currentLang === 'ar' ? 'ar' : 'en');
+  html.setAttribute('dir', t.dir);
+
+  document.getElementById('tagline').textContent         = t.tagline;
+  document.getElementById('lbl-mobile-title').innerHTML  = t.mobileTitle;
+  document.getElementById('lbl-branch-title').innerHTML  = t.branchTitle;
+  document.getElementById('lbl-msg').innerHTML            = t.msgLabel;
+  document.getElementById('p-mobile').placeholder         = t.placeholder;
+  document.getElementById('p-msg').placeholder            = t.msgPlaceholder;
+  document.getElementById('submit-btn').textContent       = t.submitBtn;
+  document.getElementById('success-title').textContent    = t.successTitle;
+  document.getElementById('success-desc').textContent     = t.successDesc;
+  document.getElementById('footer-txt').textContent       = t.footer;
+  document.getElementById('lang-btn').textContent         = t.langBtn;
+
+  // direction للـ textarea
+  const fi = document.getElementById('p-mobile');
+  const ft = document.getElementById('p-msg');
+  fi.style.direction = t.dir;
+  ft.style.direction = t.dir;
+  fi.style.textAlign = t.dir === 'ltr' ? 'left' : 'right';
+  ft.style.textAlign = t.dir === 'ltr' ? 'left' : 'right';
+
+  renderBranches();
+}
+
+// تهيئة الفروع
+renderBranches();
+
+function normalizeSaudiMobile(raw) {
+  let d = raw.replace(/[\s\-]/g, '');
+  if(d.startsWith('+966')) d = d.slice(4);
+  else if(d.startsWith('00966')) d = d.slice(5);
+  else if(d.startsWith('966')) d = d.slice(3);
+  if(d.startsWith('0')) d = d.slice(1);
+  return /^5[0-9]{8}$/.test(d) ? d : null;
+}
+
+window.submitMsg = async function() {
+  const t = TEXTS[currentLang];
+  const mobRaw = document.getElementById('p-mobile').value.trim();
+  const msg    = document.getElementById('p-msg').value.trim();
+
+  if(!mobRaw){ alert(t.errMobile); document.getElementById('p-mobile').focus(); return; }
+  const mob = normalizeSaudiMobile(mobRaw);
+  if(!mob){ alert(t.errMobileInvalid); document.getElementById('p-mobile').focus(); return; }
+  if(!msg){ alert(t.errMsg); document.getElementById('p-msg').focus(); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = t.sending;
+
+  try {
+    const snap = await getDoc(doc(db, COL, "messages"));
+    const messages = snap.exists() ? (snap.data().items ?? []) : [];
+    messages.unshift({
+      id: mob, mobile: mob,
+      branch: window.selectedBranch || '',
+      text: msg,
+      ts: new Date().toISOString(),
+      converted: false, convertedBy: null
+    });
+    await setDoc(doc(db, COL, "messages"), { items: messages });
+
+    document.getElementById('form-card').style.display = 'none';
+    const sb = document.getElementById('success-box');
+    sb.style.display = 'block';
+    document.getElementById('success-ref').textContent = t.refLabel + '0' + mob;
+  } catch(e) {
+    console.error('خطأ في الحفظ:', e);
+    alert(t.errSend);
+    btn.disabled = false;
+    btn.textContent = t.submitBtn;
+  }
+};
+
+window.resetForm = function() {
+  document.getElementById('p-mobile').value = '';
+  document.getElementById('p-msg').value = '';
+  window.selectedBranch = '';
+  renderBranches();
+  document.getElementById('form-card').style.display = 'block';
+  document.getElementById('success-box').style.display = 'none';
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = false;
+  btn.textContent = TEXTS[currentLang].submitBtn;
+};
+</script>
+</body>
+</html>
